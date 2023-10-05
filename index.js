@@ -1,5 +1,6 @@
 const fs = require('fs')
 const http = require('http');
+const { url } = require('inspector');
 const urL= require('url');
 
 
@@ -59,23 +60,24 @@ const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.htm
 
 
 
-
-
-
 const server = http.createServer((req , res) =>{
-    const pathName = req.url;
+    
+    const {query , pathname} = urL.parse(req.url, true)
+    
     //overview page
-    if(pathName === '/'  || pathName === '/overview'){
+    if(pathname === '/'  || pathname === '/overview'){
         res.writeHead(200 , {'Content-type' : 'text/html'});
         const cardsHtml = dataObj.map(el => replaceTemplate(tempCard , el)).join('')
         const output  = tempOverview.replace('{%PRODUCT_CARDS%}' , cardsHtml)
         res.end(output)
     //product page
-    }else if (pathName === "/product"){
+    }else if (pathname === "/product"){
         res.writeHead(200 , {'Content-type' : 'text/html'});
-        res.end(tempOverview)
+        const product = dataObj[query.id]
+        const output = replaceTemplate(tempProduct , product)
+        res.end(output)
      // API
-    }else if (pathName === '/api'){
+    }else if (pathname === '/api'){
         res.writeHead(200 , {'Content-type' : 'text/html'});
         res.end()
         // NOT found
@@ -87,9 +89,6 @@ const server = http.createServer((req , res) =>{
         res.end('<h1>Page not found</h1>');
     }
 })
-
-
-
 server.listen(8000 , '127.0.0.1' , () => {
     console.log("Listening to requets")
 });
