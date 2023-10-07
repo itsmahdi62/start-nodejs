@@ -1,8 +1,7 @@
 const fs = require('fs')
 const http = require('http');
-const { url } = require('inspector');
 const urL= require('url');
-
+const slugify = require('slugify')
 
 ////////////      files
 //blocking  , synchronous way
@@ -44,7 +43,8 @@ const tempOverview = fs.readFileSync(`${__dirname}/templates/template-overview.h
 const tempCard = fs.readFileSync(`${__dirname}/templates/template-card.html`, "utf-8");
 const tempProduct = fs.readFileSync(`${__dirname}/templates/template-product.html`, "utf-8");
 
-
+const slugs = dataObj.map(el => slugify(el.productName , {lower:true}))
+console.log(slugs)
 
 const server = http.createServer((req , res) =>{
     
